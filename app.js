@@ -23,18 +23,30 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+const allowedOrigins = [
+  'https://real-estate-frontend-wine-iota.vercel.app',
+  'http://localhost:3000', // Add your local development URL
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true,
+}));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Root route
 app.get('/', (req, res) => {
   res.send('Welcome to the Property Management API!');
 });
 
-// API routes
 app.use('/api/user', userRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/assets', propertyassetsRoutes);
@@ -50,10 +62,8 @@ app.use('/api/amenities', amenitiesRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/filter', filterRoutes);
 
-// Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -64,13 +74,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB is connected'))
   .catch((err) => console.log(err));
 
-// Start the server
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
