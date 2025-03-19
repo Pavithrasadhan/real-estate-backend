@@ -39,18 +39,17 @@ router.get('/', async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
     try {
-      const { messageContent } = req.body;
+        const deletedMessage = await Message.findByIdAndDelete(req.params.id);
   
-      const deletedMessage = await Message.findOneAndDelete({ message: messageContent });
+        if (!deletedMessage) {
+            return res.status(404).json({ error: "Message not found" });
+        }
   
-      if (!deletedMessage) {
-        return res.status(404).json({ error: "Message not found" });
-      }
-  
-      res.status(200).json({ message: "Message deleted successfully", deletedMessage });
+        res.status(200).json({ message: "Message deleted successfully", deletedMessage });
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete message" });
+        res.status(500).json({ error: "Failed to delete message" });
     }
-  });
+});
+
   
 module.exports = router;
