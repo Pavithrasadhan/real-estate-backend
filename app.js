@@ -24,7 +24,7 @@ require('dotenv').config();
 const app = express();
 
 const allowedOrigins = [
-  'https://real-estate-frontend-rho.vercel.app',
+  'https://real-estate-frontend-gray.vercel.app',
   'http://localhost:3000', // Add your local development URL
 ];
 
