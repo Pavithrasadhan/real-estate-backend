@@ -41,8 +41,7 @@ router.post('/', Upload.fields([
     }
   });
 
-
-  router.put('/:id', Upload.fields([
+router.put('/:id', Upload.fields([
     { name: 'image', maxCount: 20 },
     { name: 'QRcode', maxCount: 1 },
   ]), async (req, res) => {
@@ -51,26 +50,6 @@ router.post('/', Upload.fields([
       const property = await Properties.findById(id);
       if (!property) {
         return res.status(404).json({ message: 'Property not found' });
-      }
-  
-      if (req.files?.image) {
-        const newImages = req.files.image.map(file => file.path);
-        if (req.body.replaceImages === 'true') {
-          property.image = newImages;
-        } else {
-          property.image = [...property.image, ...newImages];
-        }
-      }
-  
-      if (req.files?.QRcode) {
-        const newQRPath = req.files.QRcode[0].path;
-        if (property.QRcode) {
-          const oldQRPath = path.join(__dirname, '..', property.QRcode);
-          if (fs.existsSync(oldQRPath)) {
-            fs.unlinkSync(oldQRPath);
-          }
-        }
-        property.QRcode = newQRPath;
       }
   
       if (req.body.amenities !== undefined) {
@@ -91,7 +70,7 @@ router.post('/', Upload.fields([
           console.error('Error parsing amenities:', error);
         }
       }
-
+  
       const { amenities, ...updateData } = req.body;
       Object.assign(property, updateData);
   
@@ -102,7 +81,6 @@ router.post('/', Upload.fields([
       res.status(500).json({ message: 'Internal server error', error: err.message });
     }
   });
-
 router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
