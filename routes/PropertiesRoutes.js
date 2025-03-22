@@ -56,9 +56,9 @@ router.post('/', Upload.fields([
       if (req.files?.image) {
         const newImages = req.files.image.map(file => file.path);
         if (req.body.replaceImages === 'true') {
-          property.image = newImages; 
+          property.image = newImages;
         } else {
-          property.image = [...property.image, ...newImages]; 
+          property.image = [...property.image, ...newImages];
         }
       }
   
@@ -67,43 +67,41 @@ router.post('/', Upload.fields([
         if (property.QRcode) {
           const oldQRPath = path.join(__dirname, '..', property.QRcode);
           if (fs.existsSync(oldQRPath)) {
-            fs.unlinkSync(oldQRPath); 
+            fs.unlinkSync(oldQRPath);
           }
         }
-        property.QRcode = newQRPath; 
+        property.QRcode = newQRPath;
       }
   
       if (req.body.amenities !== undefined) {
         try {
-        
-            if (typeof req.body.amenities === 'string' && req.body.amenities.startsWith('[')) {
-                property.amenities = JSON.parse(req.body.amenities);
-            } else if (Array.isArray(req.body.amenities)) {
-                property.amenities = req.body.amenities;
-            } else if (typeof req.body.amenities === 'string') {
-                property.amenities = req.body.amenities.split(',').map(item => item.trim());
-            }
+          let newAmenities;
+          if (typeof req.body.amenities === 'string' && req.body.amenities.startsWith('[')) {
+            newAmenities = JSON.parse(req.body.amenities);
+          } else if (Array.isArray(req.body.amenities)) {
+            newAmenities = req.body.amenities;
+          } else if (typeof req.body.amenities === 'string') {
+            newAmenities = req.body.amenities.split(',').map(item => item.trim());
+          }
+  
+          if (newAmenities && JSON.stringify(newAmenities) !== JSON.stringify(property.amenities)) {
+            property.amenities = newAmenities;
+          }
         } catch (error) {
-            console.error('Error parsing amenities:', error);
-            property.amenities = [];
+          console.error('Error parsing amenities:', error);
         }
-    }
-    
-    
-    const { amenities, ...updateData } = req.body;
-    Object.assign(property, updateData);
-    
-    
+      }
+
+      const { amenities, ...updateData } = req.body;
+      Object.assign(property, updateData);
   
-      const updatedProperty = await Properties.findByIdAndUpdate(id, property, { new: true, runValidators: true });
-  
+      const updatedProperty = await property.save();
       res.status(200).json({ message: 'Property updated successfully', property: updatedProperty });
     } catch (err) {
       console.error('Property update error:', err);
       res.status(500).json({ message: 'Internal server error', error: err.message });
     }
   });
-
 
 router.get('/', async (req, res) => {
     try {
