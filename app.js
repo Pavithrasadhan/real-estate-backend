@@ -25,20 +25,20 @@ const app = express();
 
 const allowedOrigins = [
   'https://real-estate-eta-steel.vercel.app',
-  'http://localhost:3000', // Add your local development URL
+  'http://localhost:3000',
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  origin: (origin, callback) =>   {
+    if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+    },
+  methods: "GET, POST, PUT, DELETE, PATCH",
   credentials: true,
 }));
+
+app.options("*", cors());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
