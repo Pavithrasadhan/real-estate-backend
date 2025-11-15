@@ -34,7 +34,7 @@ app.use(cors({
       if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error("Not allowed by CORS"));
     },
-  methods: "GET, POST, PUT, DELETE, PATCH",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
 }));
 
