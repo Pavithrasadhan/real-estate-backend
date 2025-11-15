@@ -6,6 +6,7 @@ const upload = require('../middleware/Multer');
 const Agent = require('../models/agents');
 
 // GET all agents with pagination
+// GET all agents with pagination
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
